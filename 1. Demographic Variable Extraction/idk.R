@@ -1,10 +1,11 @@
 setwd("/Users/alexis/Library/CloudStorage/OneDrive-UniversityofNorthCarolinaatChapelHill/CEMALB_DataAnalysisPM/Projects/P1009. NC ENVRIOSCAN/P1009.3. Analyses/P1009.3.3. Demographic Variable Extraction")
 
-cur_date = "092022"
+cur_date = "092122"
 
 library(readxl)
 library(tidyverse)
 library(tidycensus)
+library(ggpubr)
 
 # reading in files
 acs_df = data.frame(read_excel("Input/ACS_Data_091422.xlsx", sheet = 2)) #R13168684_SL140.csv
@@ -127,22 +128,45 @@ log_train = glm(Avg_Wildfire.Hazard.Potential.Mean ~ Per_Poverty, data = wildfir
 summarized_log_train = summary(log_train)
 summarized_log_train$coefficients[6:7]
 
+# getting the poverty col names to iterate through them using a loop in the function below
+poverty_variables = colnames(wildfire_hazard_acs_geometry_df)[113:121]
+
 
 # creating the logistic regression function 
-logistic_regression = function (df){
+logistic_regression = function (df, SES_variables){
   # EXPLAIN FUNCTION HERE!!!
   
-  # getting the poverty col names to iterate through them using a loop in the function below
-  poverty_variables = colnames(wildfire_hazard_acs_geometry_df)[113:122]
-  
   # creating an empty df to store the t and p values from the logistic regression
-  for (i in 1:length(poverty_variables)){
-    print(poverty_variables[i])
-    #log_train = glm(as.formula(paste0(Avg_Wildfire.Hazard.Potential.Mean, "~", poverty_variables[i])), data = wildfire_hazard_acs_geometry_df, family = gaussian)
-    #summarized_log_train = summary(log_train)
+  values_df = data.frame()
+  for (i in 1:length(SES_variables)){
+    log_train = glm(as.formula(paste0("Avg_Wildfire.Hazard.Potential.Mean", "~", SES_variables[i])), data = df, family = gaussian)
+    summarized_log_train = summary(log_train)
+    
+    # creating a row of data that specifies the method, variable, statistic, and p value
+    log_values = c("Logistic Regression", SES_variables[i], summarized_log_train$coefficients[c(6,8)])
+    
+    # adding just the name statistic and p value to the df
+    values_df = rbind(values_df, log_values)
+    
   }  
-  #return(summarized_log_train$coefficients[6:7])
+  
+  # adding colnames
+  colnames(values_df) = c("Method", "Variable", "Statistic", "P Value")
+  
+  return(values_df)
 }
 
 # calling function
-logistic_regression(wildfire_hazard_acs_geometry_df)
+logistic_regression(wildfire_hazard_acs_geometry_df, poverty_variables)
+
+
+# creating linear plots
+plots = list()
+for (i in 1:length(poverty_variables)){
+  plots[[i]] = ggplot(data = wildfire_hazard_acs_geometry_df, mapping = aes_string(x = poverty_variables[i], y = "Avg_Wildfire.Hazard.Potential.Mean")) + 
+    geom_point() + 
+    geom_smooth(method = "lm", se = FALSE) + 
+    theme_bw()
+}
+#viewing all plots
+ggarrange(plotlist = plots)
