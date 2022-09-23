@@ -1,6 +1,6 @@
 setwd("/Users/alexis/Library/CloudStorage/OneDrive-UniversityofNorthCarolinaatChapelHill/CEMALB_DataAnalysisPM/Projects/P1009. NC ENVRIOSCAN/P1009.3. Analyses/P1009.3.3. Demographic Variable Extraction")
 
-cur_date = "092122"
+cur_date = "092322"
 
 library(readxl)
 library(tidyverse)
@@ -16,9 +16,7 @@ wildfire_tract_df = wildfire_tract_df %>%
   select(GEOID, NAME, NAMELSAD, ALAND, AWATER, Avg_Wildfire.Hazard.Potential.Min, Min_Wildfire.Hazard.Potential.Max,
   Max_Wildfire.Hazard.Potential.Min, Avg_Wildfire.Hazard.Potential.Max, Min_Wildfire.Hazard.Potential.Max,
   Max_Wildfire.Hazard.Potential.Max, Avg_Wildfire.Hazard.Potential.Mean, Min_Wildfire.Hazard.Potential.Mean,
-  Max_Wildfire.Hazard.Potential.Mean, Avg_ACRES, Min_ACRES, Max_ACRES) #%>%
-  # makes a col entitled FIPS based on the GEOID
-  #mutate(FIPS = GEOID)
+  Max_Wildfire.Hazard.Potential.Mean, Avg_ACRES, Min_ACRES, Max_ACRES) 
 
 # renaming to create a FIPS col so we can merge the two dataframes
 acs_df = acs_df %>%
@@ -67,15 +65,6 @@ wildfire_hazard_acs_geometry_df = wildfire_hazard_acs_geometry_df %>%
 wildfire_hazard_acs_geometry_df$NonWhite <- (wildfire_hazard_acs_geometry_df$SE_A00001_001 - wildfire_hazard_acs_geometry_df$SE_B04001_003)
 wildfire_hazard_acs_geometry_df$Poverty <- (wildfire_hazard_acs_geometry_df$SE_A13003A_002 + wildfire_hazard_acs_geometry_df$SE_A13003B_002 + wildfire_hazard_acs_geometry_df$SE_A13003C_002)
 
-# creating a function to calculate percentages of each demographic variable to be added to the dataframe later on 
-#get_variable_percentages = function(df, column_name1, column_name2, percentage_column_name){
-#  # EXPLAIN THE FUNCTION MORE HERE!!!!!
-#  df[[percentage_column_name]] = df[[column_name1]] / df[[column_name2]] * 100
-  
-#  return(df)
-#}
-
-# calling function
 
 # it would be nice to make these lines more efficient , but that's not possible since the total population to calculqte each percentage are different for each column
 # total population %  (further stratified by race, age)
@@ -122,28 +111,27 @@ wildfire_hazard_acs_geometry_df$Per_Private_Ins <- (wildfire_hazard_acs_geometry
 
 # EXPORT THE FILE HERE
 
-# GLM: determining if each demographic is associated with avg wildfire hazard potential mean
-# logistic regression algorithm
-log_train = glm(Avg_Wildfire.Hazard.Potential.Mean ~ Per_Poverty, data = wildfire_hazard_acs_geometry_df, family = gaussian)
-summarized_log_train = summary(log_train)
-summarized_log_train$coefficients[6:7]
+# Determining if each demographic is associated with avg wildfire hazard potential mean using linear and logistic regression
 
 # getting the poverty col names to iterate through them using a loop in the function below
 poverty_variables = colnames(wildfire_hazard_acs_geometry_df)[113:121]
 
 
-# creating the logistic regression function 
-logistic_regression = function (df, SES_variables){
+# creating the linear regression function 
+linear_regression = function (df, SES_variables){
   # EXPLAIN FUNCTION HERE!!!
   
   # creating an empty df to store the t and p values from the logistic regression
   values_df = data.frame()
   for (i in 1:length(SES_variables)){
-    log_train = glm(as.formula(paste0("Avg_Wildfire.Hazard.Potential.Mean", "~", SES_variables[i])), data = df, family = gaussian)
-    summarized_log_train = summary(log_train)
+    # generalized linear model (GLM)
+    linear_model = glm(as.formula(paste0("Avg_Wildfire.Hazard.Potential.Mean", "~", SES_variables[i])), data = df, family = gaussian)
+    summarized_linear_model = summary(linear_model)
     
     # creating a row of data that specifies the method, variable, statistic, and p value
-    log_values = c("Logistic Regression", SES_variables[i], summarized_log_train$coefficients[c(6,8)])
+    log_values = c("Linear Regression", SES_variables[i], summarized_linear_model$coefficients[c(6,8)])
+    
+    # ADD ADJUSTED P VALUE
     
     # adding just the name statistic and p value to the df
     values_df = rbind(values_df, log_values)
@@ -157,7 +145,7 @@ logistic_regression = function (df, SES_variables){
 }
 
 # calling function
-logistic_regression(wildfire_hazard_acs_geometry_df, poverty_variables)
+lm_results = linear_regression(wildfire_hazard_acs_geometry_df, poverty_variables)
 
 
 # creating linear plots
