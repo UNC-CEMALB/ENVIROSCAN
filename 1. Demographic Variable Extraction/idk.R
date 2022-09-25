@@ -6,6 +6,7 @@ library(readxl)
 library(tidyverse)
 library(tidycensus)
 library(ggpubr)
+library(quantreg)
 
 # reading in files
 acs_df = data.frame(read_excel("Input/ACS_Data_091422.xlsx", sheet = 2)) #R13168684_SL140.csv
@@ -111,17 +112,21 @@ wildfire_hazard_acs_geometry_df$Per_Private_Ins <- (wildfire_hazard_acs_geometry
 
 # EXPORT THE FILE HERE
 
-# Determining if each demographic is associated with avg wildfire hazard potential mean using linear and logistic regression
+# Determining if each SES variable is associated with avg wildfire hazard potential mean using linear and logistic regression
 
 # getting the poverty col names to iterate through them using a loop in the function below
-poverty_variables = colnames(wildfire_hazard_acs_geometry_df)[113:121]
+poverty_variables = colnames(wildfire_hazard_acs_geometry_df)[112:121]
 
 
 # creating the linear regression function 
 linear_regression = function (df, SES_variables){
-  # EXPLAIN FUNCTION HERE!!!
+  # """
+  # Creating a function to perform linear regression.
+  # :param (input): df (containing data to be analyzed), socioeconomic status (SES variables)
+  # :output: df containing the model/method, SES variable, statistic, p value, and p adjust
+  # """
   
-  # creating an empty df to store the t and p values from the logistic regression
+  # creating an empty df to store the t and p values from the linear regression
   values_df = data.frame()
   for (i in 1:length(SES_variables)){
     # generalized linear model (GLM)
@@ -129,17 +134,18 @@ linear_regression = function (df, SES_variables){
     summarized_linear_model = summary(linear_model)
     
     # creating a row of data that specifies the method, variable, statistic, and p value
-    log_values = c("Linear Regression", SES_variables[i], summarized_linear_model$coefficients[c(6,8)])
-    
-    # ADD ADJUSTED P VALUE
+    linear_values = c("Linear Regression", SES_variables[i], summarized_linear_model$coefficients[c(6,8)])
     
     # adding just the name statistic and p value to the df
-    values_df = rbind(values_df, log_values)
+    values_df = rbind(values_df, linear_values)
     
   }  
   
   # adding colnames
   colnames(values_df) = c("Method", "Variable", "Statistic", "P Value")
+  
+  # adjusting p value
+  values_df$`P Adj` = p.adjust(as.numeric(as.character(values_df$`P Value`)), method = "fdr")
   
   return(values_df)
 }
@@ -154,6 +160,68 @@ for (i in 1:length(poverty_variables)){
   plots[[i]] = ggplot(data = wildfire_hazard_acs_geometry_df, mapping = aes_string(x = poverty_variables[i], y = "Avg_Wildfire.Hazard.Potential.Mean")) + 
     geom_point() + 
     geom_smooth(method = "lm", se = FALSE) + 
+    theme_bw()
+}
+#viewing all plots
+ggarrange(plotlist = plots)
+
+
+# now trying quantile regression
+# wildfire hazard potential (WHP) already seems to be grouping in strata, so quantile regression performs linear regression within each quantile
+
+# creating the quantile regression function 
+quantile_regression = function (df, SES_variables){
+  # """
+  # Creating a function to perform linear quantile regression.
+  # :param (input): df (containing data to be analyzed), socioeconomic status (SES variables)
+  # :output: df containing the model/method, SES variable, quantile, statistic, p value, and p adjust
+  # """
+  
+  # creating a vector to loop through for the argument tau that specifies the quantile
+  tau_values = c(0.2, 0.4, 0.6, 0.8) #seq(0, 1, by = 0.2)
+  
+  # creating an empty df to store the t and p values from the quantile regression
+  values_df = data.frame()
+  
+  for (i in 1:length(SES_variables)){
+    for (j in 1:length(tau_values)){
+      # quantile linear regression
+      print(SES_variables[i])
+      print(tau_values[j])
+      quantile_model = rq(as.formula(paste0("Avg_Wildfire.Hazard.Potential.Mean", "~", SES_variables[i])), data = df, tau = tau_values[j])
+      summarized_quantile_model = summary(quantile_model)
+      
+      # creating a row of data that specifies the method, variable, tau, statistic, and p value
+      quantile_values = c("Quantile Regression", SES_variables[i], tau_values[j], summarized_quantile_model$coefficients[c(6,8)])
+      
+      # adding just the name statistic and p value to the df
+      values_df = rbind(values_df, quantile_values)
+      
+      }  
+    }
+  
+  # adding colnames
+  colnames(values_df) = c("Method", "Variable", "Quantile", "Statistic", "P Value")
+  
+  # adjusting p value within each quantile
+  values_df = values_df %>%
+    group_by(Quantile) %>%
+    mutate(`P Adjust` = p.adjust(as.numeric(as.character(`P Value`)), method = "fdr")) %>%
+    ungroup()
+  
+  return(values_df)
+}
+
+# calling function
+quantile_results = quantile_regression(wildfire_hazard_acs_geometry_df, poverty_variables)
+
+
+# creating quantile plots
+plots = list()
+for (i in 1:length(poverty_variables)){
+  plots[[i]] = ggplot(data = wildfire_hazard_acs_geometry_df, mapping = aes_string(x = poverty_variables[i], y = "Avg_Wildfire.Hazard.Potential.Mean")) + 
+    geom_point() + 
+    geom_quantile(quantile = c(0.2, 0.4, 0.6, 0.8), method = "rq") + 
     theme_bw()
 }
 #viewing all plots
