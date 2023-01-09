@@ -1,2 +1,2 @@
 # Sociodemographic Clustering
-Using k means to determine if there's an association between sociodemographic data and wildfire hazard potential (WHP) quintiles
+Using Principal Component Analysis (PCA) to determine if there's an association between sociodemographic data and wildfire hazard potential (WHP) quintiles
