@@ -1,2 +1,8 @@
-# Sociodemographic, Housing, & Wildfire Imputation
-Using random forest (RF) to generate missing sociodemographic and housing data from the 2010 American Community Survey (ACS) and wildfire data
+# Sociodemographic Imputation
+Using random forest (RF) to generate missing sociodemographic data from the 2010 American Community Survey (ACS) 
+
+# Housing Imputation
+Using random forest (RF) to generate missing housing data from the 2010 American Community Survey (ACS)
+
+#  Wildfire Imputation
+Using random forest (RF) to generate missing wildfire potential data and put those data into quintiles
