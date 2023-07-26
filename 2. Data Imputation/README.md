@@ -1,5 +1,5 @@
 # Sociodemographic Imputation
-Using random forest (RF) to generate missing sociodemographic data from the 2010 American Community Survey (ACS) 
+Using random forest (RF) to generate missing sociodemographic and socioeconomic data from the 2010 American Community Survey (ACS) 
 
 # Housing Imputation
 Using random forest (RF) to generate missing housing data from the 2010 American Community Survey (ACS)
