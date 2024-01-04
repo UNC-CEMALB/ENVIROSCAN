@@ -3,6 +3,10 @@
 
 This study sought to identify regions of high risk to future wildfire events and determine what communities are most vulnerable to those effects based on socioeconomic and sociodemographic factors. This information will be disseminated through North Carolina ENVIROSCAN, which helps communities increase awareness of key environmental and societal factors that can impact health.
 
+In the instance that the files are unable to rendered on Github the NBViewer link can be clicked below.
+
+[Link to NBViewer](https://nbviewer.org/github/UNC-CEMALB/Wildfires-and-Environmental-Justice-Future-Wildfire-Events-Predicted-to-Disproportionally-Impact-So/tree/main/)
+
 
 # 1. WHP Data Cleaning
 - Cleaning up the wildfire hazard data including adding in county names
