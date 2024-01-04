@@ -22,7 +22,7 @@ In the instance that the files are unable to rendered on Github the NBViewer lin
 # 4. Cluster Variable Averages (Figure 4 & S1)
 - Plotting scaled and unscaled sociodemographic and housing variable averages per cluster
 
-# 5. North Carolina (NC) Mapping
+# 5. North Carolina (NC) Mapping (Figure 1, Figure 3, & Table S1)
 - Mapping (Figure 1 & Figure 3): Visualizing wildfire hazard potential (WHP) mean by GEO id and county, visualizing wildfire hazard potential (WHP) quintile by GEO id and county, and
 comparing WHP mean to sociodemographic clusters and housing clusters all by GEO id
 - WHP County Averages (Table S1): Creating a table that contains WHP values averaged within each county
