@@ -1,7 +1,9 @@
 # Wildfires and Environmental Justice: Future Wildfire Events Predicted to Disproportionally Impact Socioeconomically Vulnerable Communities in North Carolina
 
+Script that associates with 'Wildfires and Environmental Justice: Future Wildfire Events Predicted to Disproportionally Impact Socioeconomically Vulnerable Communities in North Carolina', published in 2024 in Frontiers. doi: https://doi.org/10.3389/fpubh.2024.1339700
 
-This study sought to identify regions of high risk to future wildfire events and determine what communities are most vulnerable to those effects based on socioeconomic and sociodemographic factors. This information will be disseminated through North Carolina ENVIROSCAN, which helps communities increase awareness of key environmental and societal factors that can impact health.
+> This study sought to identify regions of high risk to future wildfire events and determine what communities are most vulnerable to those effects based on socioeconomic and sociodemographic factors. This information will be disseminated through North Carolina ENVIROSCAN, which helps communities increase awareness of key environmental and societal factors that can impact health.
+> All analyses in this respository are designated by their figure number or table number in the manuscript in parantheses.
 
 In the instance that the files are unable to rendered on Github the NBViewer link can be clicked below.
 
