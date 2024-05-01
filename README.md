@@ -5,10 +5,9 @@ Script that associates with 'Wildfires and Environmental Justice: Future Wildfir
 > This study sought to identify regions of high risk to future wildfire events and determine what communities are most vulnerable to those effects based on socioeconomic and sociodemographic factors. This information will be disseminated through North Carolina ENVIROSCAN, which helps communities increase awareness of key environmental and societal factors that can impact health.
 > All analyses in this respository are designated by their figure number or table number in the manuscript in parantheses.
 
-In the instance that the files are unable to rendered on Github the NBViewer link can be clicked below.
+In the instance that the files are unable to rendered on Github the files can be viewed using NBViewer [here](https://nbviewer.org/github/UNC-CEMALB/Wildfires-and-Environmental-Justice-Future-Wildfire-Events-Predicted-to-Disproportionally-Impact-So/tree/main/).
 
-[Link to NBViewer](https://nbviewer.org/github/UNC-CEMALB/Wildfires-and-Environmental-Justice-Future-Wildfire-Events-Predicted-to-Disproportionally-Impact-So/tree/main/)
-
+<br>
 
 # 1. WHP Data Cleaning
 - Cleaning up the wildfire hazard data including adding in county names
